@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تحليل تعليقات الفندق — سكني</title>
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 350 400'%3E%3Crect width='350' height='400' fill='%230a0e1a' rx='30'/%3E%3Cpath d='M70 260 L118 230 L118 340 L70 340 Z' fill='%23ffffff'/%3E%3Cpath d='M132 90 L170 66 L208 90 L208 130 L182 114 L182 340 L154 340 L154 204 L132 218 Z' fill='%23ffffff'/%3E%3Cpath d='M214 160 L262 190 L262 246 L236 228 L236 340 L214 340 Z' fill='%23ffffff'/%3E%3Cpath d='M274 248 L292 266 L292 340 L274 340 Z' fill='%23ffffff'/%3E%3C/svg%3E">
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-weight: 500;
+        background: #0a0e1a;
+        direction: rtl;
+        color: #e2e8f0;
+        line-height: 1.5;
+        min-height: 100vh;
+    }
+
+    /* ===== الهيدر ===== */
+    .app-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: #0f121f;
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+        border-bottom: 1px solid rgba(212, 163, 115, 0.15);
+    }
+    .app-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 3px;
+        background: linear-gradient(90deg, #2ecc71, #8b5cf6, #fbbf24);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand svg { width: 34px; height: auto; flex-shrink: 0; }
+    .brand .brand-text { min-width: 0; }
+    .brand .brand-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #fbbf24;
+        white-space: nowrap;
+    }
+    .brand .brand-sub {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .header-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .update-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(74, 222, 128, 0.1);
+        border: 1px solid rgba(74, 222, 128, 0.35);
+        color: #4ade80;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .update-pill .dot {
+        width: 7px; height: 7px;
+        background: #4ade80;
+        border-radius: 50%;
+        box-shadow: 0 0 6px #4ade80;
+        animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    /* ===== المحتوى ===== */
+    .app-content {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 18px 16px 40px;
+    }
+
+    /* ===== شريط الفترة الزمنية ===== */
+    .period-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: linear-gradient(135deg, #1a1f2e, #0f121f);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+    .period-bar .pb-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #cbd5e1;
+    }
+    .period-bar .pb-item i { color: #fbbf24; font-size: 13px; }
+    .period-bar .pb-item .pb-label { color: #94a3b8; }
+    .period-bar .pb-item .pb-value { color: #e2e8f0; font-weight: 800; }
+    .period-bar .pb-range {
+        background: rgba(59, 130, 246, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        color: #60a5fa;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    /* ===== البطاقات الإحصائية ===== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .stat-card {
+        background: linear-gradient(145deg, #1a1f2e, #0f121f);
+        border-radius: 10px;
+        padding: 16px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; right: 0;
+        width: 4px; height: 100%;
+    }
+    .stat-card.sc-total::before { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
+    .stat-card.sc-pos::before   { background: linear-gradient(180deg, #4ade80, #22c55e); }
+    .stat-card.sc-neg::before   { background: linear-gradient(180deg, #f87171, #ef4444); }
+    .stat-card.sc-neu::before   { background: linear-gradient(180deg, #fbbf24, #f59e0b); }
+
+    .stat-card .sc-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+    .stat-card .sc-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #94a3b8;
+    }
+    .stat-card .sc-icon {
+        width: 34px; height: 34px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+    .sc-total .sc-icon { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+    .sc-pos   .sc-icon { background: rgba(34, 197, 94, 0.15);  color: #4ade80; }
+    .sc-neg   .sc-icon { background: rgba(239, 68, 68, 0.15);  color: #f87171; }
+    .sc-neu   .sc-icon { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+    .stat-card .sc-value {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -1px;
+        line-height: 1.1;
+        margin-bottom: 4px;
+    }
+    .sc-total .sc-value { color: #a78bfa; }
+    .sc-pos   .sc-value { color: #4ade80; }
+    .sc-neg   .sc-value { color: #f87171; }
+    .sc-neu   .sc-value { color: #fbbf24; }
+
+    .stat-card .sc-foot {
+        font-size: 11px;
+        color: #64748b;
+        font-weight: 700;
+    }
+    .stat-card .sc-pct {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+        margin-right: 6px;
+    }
+    .sc-pos .sc-pct { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+    .sc-neg .sc-pct { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .sc-neu .sc-pct { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+    /* ===== صفوف البطاقات ===== */
+    .row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .panel {
+        background: linear-gradient(145deg, #1a1f2e, #0f121f);
+        border-radius: 10px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+    .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .panel-head .ph-icon {
+        width: 30px; height: 30px;
+        border-radius: 7px;
+        background: rgba(251, 191, 36, 0.12);
+        color: #fbbf24;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+    }
+    .panel-head .ph-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: #fbbf24;
+    }
+
+    /* ===== المخطط الدائري (CSS Conic) ===== */
+    .donut-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .donut {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        position: relative;
+        flex-shrink: 0;
+        background: conic-gradient(
+            #22c55e 0deg var(--deg-pos, 0deg),
+            #ef4444 var(--deg-pos, 0deg) var(--deg-neg, 0deg),
+            #f59e0b var(--deg-neg, 0deg) var(--deg-neu, 0deg)
+        );
+    }
+    .donut::after {
+        content: '';
+        position: absolute;
+        inset: 18px;
+        border-radius: 50%;
+        background: #0f121f;
+    }
+    .donut-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+    }
+    .donut-center .dc-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #e2e8f0;
+    }
+    .donut-center .dc-label {
+        font-size: 10px;
+        color: #94a3b8;
+        font-weight: 700;
+    }
+    .donut-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .donut-legend .dl-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .donut-legend .dl-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    .donut-legend .dl-name { color: #cbd5e1; }
+    .donut-legend .dl-pct { color: #e2e8f0; font-weight: 800; margin-right: auto; padding-right: 12px; }
+
+    /* ===== الملخص التنفيذي ===== */
+    .exec-summary {
+        background: linear-gradient(135deg, #1e3a2f, #1a1f2e);
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+    .exec-summary .es-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .exec-summary .es-icon {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        background: rgba(74, 222, 128, 0.15);
+        color: #4ade80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+    .exec-summary .es-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #4ade80;
+    }
+    .exec-summary .es-body {
+        font-size: 13.5px;
+        color: #cbd5e1;
+        line-height: 1.9;
+        font-weight: 600;
+    }
+    .exec-summary .es-body strong { color: #fbbf24; font-weight: 800; }
+
+    /* ===== أبرز الملاحظات ===== */
+    .aspects-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .aspect-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .aspect-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 12px;
+        background: #0f121f;
+        border-radius: 7px;
+        border-right: 3px solid #22c55e;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: #cbd5e1;
+        line-height: 1.6;
+    }
+    .aspect-item.neg { border-right-color: #ef4444; }
+    .aspect-item .ai-icon { flex-shrink: 0; font-size: 13px; margin-top: 2px; }
+    .aspect-item.pos .ai-icon { color: #4ade80; }
+    .aspect-item.neg .ai-icon { color: #f87171; }
+    .aspect-item .ai-count {
+        margin-right: auto;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+        background: rgba(255, 255, 255, 0.06);
+        color: #94a3b8;
+        flex-shrink: 0;
+    }
+
+    .foot-note {
+        text-align: center;
+        font-size: 11px;
+        color: #64748b;
+        padding: 20px 16px 0;
+        font-weight: 600;
+    }
+
+    /* ===== الاستجابة ===== */
+    @media (max-width: 900px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .row-2 { grid-template-columns: 1fr; }
+        .aspects-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+        .app-content { padding: 14px 12px 30px; }
+        .stat-card .sc-value { font-size: 24px; }
+        .period-bar { justify-content: center; }
+        .header-meta { width: 100%; justify-content: space-between; }
+        .brand .brand-title { font-size: 13px; }
+        .donut { width: 130px; height: 130px; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ===== الهيدر ===== -->
+<header class="app-header">
+    <div class="brand">
+        <svg viewBox="60 60 250 300" xmlns="http://www.w3.org/2000/svg">
+            <path d="M70 260 L118 230 L118 340 L70 340 Z" fill="#fbbf24" />
+            <path d="M132 90 L170 66 L208 90 L208 130 L182 114 L182 340 L154 340 L154 204 L132 218 Z" fill="#fbbf24" />
+            <path d="M214 160 L262 190 L262 246 L236 228 L236 340 L214 340 Z" fill="#fbbf24" />
+            <path d="M274 248 L292 266 L292 340 L274 340 Z" fill="#fbbf24" />
+        </svg>
+        <div class="brand-text">
+            <div class="brand-title">فندق سكني — المدينة المنورة</div>
+            <div class="brand-sub">تحليل تعليقات Google Maps</div>
+        </div>
+    </div>
+    <div class="header-meta">
+        <div class="update-pill">
+            <span class="dot"></span>
+            <i class="fas fa-sync-alt" style="font-size:10px;"></i>
+            آخر تحديث: <span id="lastUpdate">—</span>
+        </div>
+    </div>
+</header>
+
+<main class="app-content">
+
+    <!-- ===== شريط الفترة الزمنية ===== -->
+    <div class="period-bar">
+        <div class="pb-item">
+            <i class="fas fa-calendar-day"></i>
+            <span class="pb-label">أقدم تعليق:</span>
+            <span class="pb-value" id="oldestDate">—</span>
+        </div>
+        <div class="pb-item">
+            <i class="fas fa-calendar-check"></i>
+            <span class="pb-label">أحدث تعليق:</span>
+            <span class="pb-value" id="newestDate">—</span>
+        </div>
+        <div class="pb-item">
+            <i class="fas fa-hourglass-half"></i>
+            <span class="pb-label">المدة:</span>
+            <span class="pb-value" id="periodSpan">—</span>
+        </div>
+        <div class="pb-range">
+            <i class="fas fa-filter"></i> نطاق التحليل: آخر 6 أشهر
+        </div>
+    </div>
+
+    <!-- ===== البطاقات الإحصائية ===== -->
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <!-- ===== صف: المخطط الدائري + التفاصيل ===== -->
+    <div class="row-2">
+        <div class="panel">
+            <div class="panel-head">
+                <div class="ph-icon"><i class="fas fa-chart-pie"></i></div>
+                <div class="ph-title">توزيع التعليقات</div>
+            </div>
+            <div class="donut-wrap">
+                <div class="donut" id="donut">
+                    <div class="donut-center">
+                        <div class="dc-value" id="donutTotal">0</div>
+                        <div class="dc-label">تعليق</div>
+                    </div>
+                </div>
+                <div class="donut-legend" id="donutLegend"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <div class="ph-icon"><i class="fas fa-star"></i></div>
+                <div class="ph-title">مؤشر رضا النزلاء</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px;">
+                        <span style="color:#94a3b8;">نسبة الرضا الإجمالية</span>
+                        <span style="color:#4ade80; font-weight:800;" id="satisfactionPct">—</span>
+                    </div>
+                    <div style="height:10px; background:#0f121f; border-radius:999px; overflow:hidden;">
+                        <div id="satisfactionBar" style="height:100%; width:0%; background:linear-gradient(90deg,#22c55e,#4ade80); border-radius:999px; transition: width 0.8s;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px;">
+                        <span style="color:#94a3b8;">نسبة الشكاوى</span>
+                        <span style="color:#f87171; font-weight:800;" id="complaintPct">—</span>
+                    </div>
+                    <div style="height:10px; background:#0f121f; border-radius:999px; overflow:hidden;">
+                        <div id="complaintBar" style="height:100%; width:0%; background:linear-gradient(90deg,#ef4444,#f87171); border-radius:999px; transition: width 0.8s;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px;">
+                        <span style="color:#94a3b8;">تقييم Google Maps</span>
+                        <span style="color:#fbbf24; font-weight:800;" id="gmRating">4.3 / 5</span>
+                    </div>
+                    <div style="display:flex; gap:3px; font-size:18px; color:#fbbf24;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== الملخص التنفيذي ===== -->
+    <div class="exec-summary">
+        <div class="es-head">
+            <div class="es-icon"><i class="fas fa-lightbulb"></i></div>
+            <div class="es-title">الإحاطة العامة — Executive Summary</div>
+        </div>
+        <div class="es-body" id="execSummary"></div>
+    </div>
+
+    <!-- ===== أبرز الملاحظات ===== -->
+    <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-head">
+            <div class="ph-icon"><i class="fas fa-list-check"></i></div>
+            <div class="ph-title">أبرز الملاحظات المتكررة</div>
+        </div>
+        <div class="aspects-grid">
+            <div>
+                <div style="font-size:12px; font-weight:800; color:#4ade80; margin-bottom:8px;">
+                    <i class="fas fa-thumbs-up"></i> الجوانب الإيجابية
+                </div>
+                <div class="aspect-list" id="positiveAspects"></div>
+            </div>
+            <div>
+                <div style="font-size:12px; font-weight:800; color:#f87171; margin-bottom:8px;">
+                    <i class="fas fa-thumbs-down"></i> الجوانب السلبية
+                </div>
+                <div class="aspect-list" id="negativeAspects"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="foot-note">© شركة سكني للمقاولات — لوحة تحليل تعليقات الفندق | البيانات تجريبية للعرض فقط</div>
+</main>
+
+<script>
+/* ================================================================
+   البيانات التجريبية — قابلة للاستبدال ببيانات Google Maps الفعلية
+   ================================================================ */
+
+const hotelData = {
+    hotelName: "فندق سكني — المدينة المنورة",
+    googleRating: 4.3,
+    lastUpdate: "2026-11-15 14:30",
+    oldestComment: "2026-05-12",
+    newestComment: "2026-11-14",
+    analysisRange: "آخر 6 أشهر",
+
+    // الإحصائيات
+    total: 428,
+    positive: 312,
+    negative: 74,
+    neutral: 42,
+
+    // الملخص التنفيذي
+    summary: `
+        يُظهر تحليل <strong>428 تعليقًا</strong> خلال آخر 6 أشهر أن الانطباع العام عن الفندق
+        <strong>إيجابي بدرجة جيدة</strong>، إذ بلغت نسبة التعليقات الإيجابية <strong>72.9%</strong>،
+        في حين شكّلت الشكاوى <strong>17.3%</strong> فقط. يتركّز الرضا بشكل واضح حول
+        <strong>موقع الفندق القريب من الحرم</strong>، و<strong>نظافة الغرف</strong>،
+        و<strong>تعامل الموظفين</strong>. أما أبرز الملاحظات السلبية فتتمحور حول
+        <strong>قدم بعض الأثاث</strong>، <strong>ضعف عزل الصوت</strong>،
+        و<strong>محدودية مواقف السيارات</strong>. وتوصي الإدارة بالتركيز على تجديد
+        الأثاث في الأدوار العليا، وتحسين العزل الصوتي، وإضافة مواقف إضافية خلال
+        المواسم، لما لذلك من أثر مباشر على رفع التقييم العام على Google Maps.
+    `,
+
+    positiveAspects: [
+        { text: "الموقع القريب من الحرم النبوي", count: 87 },
+        { text: "نظافة الغرف والمرافق", count: 64 },
+        { text: "حسن تعامل الموظفين والاستقبال", count: 51 },
+        { text: "الهدوء والراحة أثناء الإقامة", count: 38 },
+        { text: "جودة الإفطار المقدم", count: 29 }
+    ],
+
+    negativeAspects: [
+        { text: "قدم الأثاث في بعض الغرف", count: 24 },
+        { text: "ضعف عزل الصوت بين الغرف", count: 19 },
+        { text: "محدودية مواقف السيارات", count: 15 },
+        { text: "بطء خدمة الإنترنت", count: 11 },
+        { text: "تأخر الاستجابة لطلبات الصيانة", count: 8 }
+    ]
+};
+
+/* ================================================================
+   الحسابات والعرض
+   ================================================================ */
+
+function fmt(n) { return n.toLocaleString('ar-EG'); }
+function pct(n, total) { return total > 0 ? ((n / total) * 100).toFixed(1) : '0'; }
+
+function computePeriodSpan(oldest, newest) {
+    const d1 = new Date(oldest);
+    const d2 = new Date(newest);
+    const months = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+    if (months < 1) return "أقل من شهر";
+    if (months === 1) return "شهر واحد";
+    if (months === 2) return "شهران";
+    if (months <= 10) return months + " أشهر";
+    return months + " شهرًا";
+}
+
+function renderStats() {
+    const d = hotelData;
+    const grid = document.getElementById('statsGrid');
+
+    const cards = [
+        { cls: 'sc-total', icon: 'fa-comments',    label: 'إجمالي التعليقات', value: d.total,    foot: `آخر ${d.analysisRange}`, pct: null },
+        { cls: 'sc-pos',   icon: 'fa-face-smile',  label: 'التعليقات الإيجابية', value: d.positive, foot: 'انطباعات مرضية',   pct: pct(d.positive, d.total) + '%' },
+        { cls: 'sc-neg',   icon: 'fa-face-frown',  label: 'التعليقات السلبية', value: d.negative, foot: 'شكاوى وملاحظات',   pct: pct(d.negative, d.total) + '%' },
+        { cls: 'sc-neu',   icon: 'fa-face-meh',    label: 'غير المحددة', value: d.neutral, foot: 'غير مصنفة بوضوح',   pct: pct(d.neutral, d.total) + '%' }
+    ];
+
+    grid.innerHTML = cards.map(c => `
+        <div class="stat-card ${c.cls}">
+            <div class="sc-top">
+                <div class="sc-label">${c.label}</div>
+                <div class="sc-icon"><i class="fas ${c.icon}"></i></div>
+            </div>
+            <div class="sc-value">${fmt(c.value)}</div>
+            <div class="sc-foot">
+                ${c.pct ? `<span class="sc-pct">${c.pct}</span>` : ''}
+                ${c.foot}
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderDonut() {
+    const d = hotelData;
+    const t = d.total;
+    const degPos = (d.positive / t) * 360;
+    const degNeg = degPos + (d.negative / t) * 360;
+
+    const donut = document.getElementById('donut');
+    donut.style.setProperty('--deg-pos', degPos + 'deg');
+    donut.style.setProperty('--deg-neg', degNeg + 'deg');
+
+    document.getElementById('donutTotal').textContent = fmt(t);
+
+    const legend = document.getElementById('donutLegend');
+    legend.innerHTML = `
+        <div class="dl-item">
+            <span class="dl-dot" style="background:#22c55e;"></span>
+            <span class="dl-name">إيجابي</span>
+            <span class="dl-pct">${pct(d.positive, t)}%</span>
+        </div>
+        <div class="dl-item">
+            <span class="dl-dot" style="background:#ef4444;"></span>
+            <span class="dl-name">سلبي</span>
+            <span class="dl-pct">${pct(d.negative, t)}%</span>
+        </div>
+        <div class="dl-item">
+            <span class="dl-dot" style="background:#f59e0b;"></span>
+            <span class="dl-name">غير محدد</span>
+            <span class="dl-pct">${pct(d.neutral, t)}%</span>
+        </div>
+    `;
+}
+
+function renderIndicators() {
+    const d = hotelData;
+    const sat = pct(d.positive, d.total);
+    const comp = pct(d.negative, d.total);
+
+    document.getElementById('satisfactionPct').textContent = sat + '%';
+    document.getElementById('complaintPct').textContent = comp + '%';
+    document.getElementById('gmRating').textContent = d.googleRating + ' / 5';
+
+    // تأخير بسيط للحركة
+    setTimeout(() => {
+        document.getElementById('satisfactionBar').style.width = sat + '%';
+        document.getElementById('complaintBar').style.width = comp + '%';
+    }, 100);
+}
+
+function renderPeriod() {
+    const d = hotelData;
+    document.getElementById('oldestDate').textContent = d.oldestComment;
+    document.getElementById('newestDate').textContent = d.newestComment;
+    document.getElementById('periodSpan').textContent = computePeriodSpan(d.oldestComment, d.newestComment);
+    document.getElementById('lastUpdate').textContent = d.lastUpdate;
+}
+
+function renderSummary() {
+    document.getElementById('execSummary').innerHTML = hotelData.summary;
+}
+
+function renderAspects() {
+    const d = hotelData;
+    const pos = document.getElementById('positiveAspects');
+    const neg = document.getElementById('negativeAspects');
+
+    pos.innerHTML = d.positiveAspects.map(a => `
+        <div class="aspect-item pos">
+            <i class="fas fa-circle-check ai-icon"></i>
+            <span>${a.text}</span>
+            <span class="ai-count">${a.count}</span>
+        </div>
+    `).join('');
+
+    neg.innerHTML = d.negativeAspects.map(a => `
+        <div class="aspect-item neg">
+            <i class="fas fa-circle-exclamation ai-icon"></i>
+            <span>${a.text}</span>
+            <span class="ai-count">${a.count}</span>
+        </div>
+    `).join('');
+}
+
+/* ================================================================
+   التهيئة
+   ================================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+    renderPeriod();
+    renderStats();
+    renderDonut();
+    renderIndicators();
+    renderSummary();
+    renderAspects();
+});
+</script>
+</body>
+</html>
