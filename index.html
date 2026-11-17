@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تحليل تعليقات الفندق — فندق حياة المدينة</title>
 
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 550'%3E%3Crect width='1000' height='550' fill='%230a0e1a'/%3E%3Crect x='85' y='30' width='38' height='490' fill='%23454B7E'/%3E%3Crect x='240' y='30' width='38' height='490' fill='%23454B7E'/%3E%3Crect x='331' y='30' width='38' height='490' fill='%23A19C96'/%3E%3Cpolygon points='369,30 500,240 631,30 660,30 660,520 631,520 631,155 500,345 369,155 369,520 340,520 340,30' fill='%23A19C96'/%3E%3Crect x='631' y='30' width='38' height='490' fill='%23A19C96'/%3E%3Crect x='722' y='30' width='38' height='490' fill='%23454B7E'/%3E%3Crect x='877' y='30' width='38' height='490' fill='%23454B7E'/%3E%3Cpath d='M 20 370 C 140 290, 320 245, 500 240 C 680 235, 860 290, 980 370 L 955 395 C 840 320, 680 270, 500 265 C 320 260, 160 320, 45 395 Z' fill='%23454B7E'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 550'%3E%3Crect width='1000' height='550' fill='%230a0e1a'/%3E%3Crect x='85' y='30' width='38' height='490' fill='%239aa0d6'/%3E%3Crect x='240' y='30' width='38' height='490' fill='%239aa0d6'/%3E%3Crect x='331' y='30' width='38' height='490' fill='%23d8d3cc'/%3E%3Cpolygon points='369,30 500,240 631,30 660,30 660,520 631,520 631,155 500,345 369,155 369,520 340,520 340,30' fill='%23d8d3cc'/%3E%3Crect x='631' y='30' width='38' height='490' fill='%23d8d3cc'/%3E%3Crect x='722' y='30' width='38' height='490' fill='%239aa0d6'/%3E%3Crect x='877' y='30' width='38' height='490' fill='%239aa0d6'/%3E%3Cpath d='M 20 370 C 140 290, 320 245, 500 240 C 680 235, 860 290, 980 370 L 955 395 C 840 320, 680 270, 500 265 C 320 260, 160 320, 45 395 Z' fill='%239aa0d6'/%3E%3C/svg%3E">
 
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -46,18 +46,14 @@
     }
     .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
 
-    /* شعار فندق حياة المدينة — حاوية بيضاء صغيرة */
+    /* شعار فندق حياة المدينة — مفرّغ بدون خلفية */
     .brand-logo {
-        width: 54px;
-        height: 46px;
-        background: #ffffff;
-        border-radius: 6px;
-        padding: 4px 6px;
+        width: 58px;
+        height: 44px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
     .brand-logo svg {
         width: 100%;
@@ -118,39 +114,70 @@
         padding: 18px 16px 40px;
     }
 
-    /* ===== شريط الفترة الزمنية ===== */
-    .period-bar {
+    /* ===== كارت الفترة الزمنية ===== */
+    .period-card {
+        background: linear-gradient(145deg, #1a1f2e, #0f121f);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        gap: 16px;
         flex-wrap: wrap;
-        background: linear-gradient(135deg, #1a1f2e, #0f121f);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin-bottom: 16px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
     }
-    .period-bar .pb-item {
+    .period-card::before {
+        content: '';
+        position: absolute;
+        top: 0; right: 0;
+        width: 4px; height: 100%;
+        background: linear-gradient(180deg, #9aa0d6, #454B7E);
+    }
+    .period-card .pc-left {
         display: flex;
         align-items: center;
-        gap: 7px;
+        gap: 14px;
+        min-width: 0;
+    }
+    .period-card .pc-icon {
+        width: 44px; height: 44px;
+        border-radius: 10px;
+        background: rgba(69, 75, 126, 0.35);
+        color: #9aa0d6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    .period-card .pc-text { min-width: 0; }
+    .period-card .pc-label {
         font-size: 12px;
         font-weight: 700;
-        color: #cbd5e1;
+        color: #94a3b8;
+        margin-bottom: 3px;
     }
-    .period-bar .pb-item i { color: #fbbf24; font-size: 13px; }
-    .period-bar .pb-item .pb-label { color: #94a3b8; }
-    .period-bar .pb-item .pb-value { color: #e2e8f0; font-weight: 800; }
-    .period-bar .pb-range {
-        background: rgba(69, 75, 126, 0.35);
-        border: 1px solid rgba(69, 75, 126, 0.8);
-        color: #c7cbe8;
-        padding: 5px 12px;
-        border-radius: 999px;
-        font-size: 12px;
+    .period-card .pc-value {
+        font-size: 18px;
         font-weight: 800;
+        color: #e2e8f0;
+    }
+    .period-card .pc-range {
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.35);
+        color: #fbbf24;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 800;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
     }
 
     /* ===== البطاقات الإحصائية ===== */
@@ -275,7 +302,7 @@
         color: #fbbf24;
     }
 
-    /* ===== المخطط الدائري (CSS Conic) ===== */
+    /* ===== المخطط الدائري ===== */
     .donut-wrap {
         display: flex;
         align-items: center;
@@ -378,6 +405,8 @@
         color: #cbd5e1;
         line-height: 1.9;
         font-weight: 600;
+        text-align: justify;   /* ← الخط مبرر */
+        text-justify: inter-word;
     }
     .exec-summary .es-body strong { color: #fbbf24; font-weight: 800; }
 
@@ -437,11 +466,12 @@
     @media (max-width: 520px) {
         .app-content { padding: 14px 12px 30px; }
         .stat-card .sc-value { font-size: 24px; }
-        .period-bar { justify-content: center; }
         .header-meta { width: 100%; justify-content: space-between; }
         .brand .brand-title { font-size: 13px; }
-        .brand-logo { width: 46px; height: 40px; }
+        .brand-logo { width: 50px; height: 38px; }
         .donut { width: 130px; height: 130px; }
+        .period-card { flex-direction: column; align-items: flex-start; }
+        .period-card .pc-range { width: 100%; justify-content: center; }
     }
 </style>
 </head>
@@ -450,17 +480,17 @@
 <!-- ===== الهيدر ===== -->
 <header class="app-header">
     <div class="brand">
-        <!-- شعار فندق حياة المدينة -->
+        <!-- شعار فندق حياة المدينة — مفرّغ (بدون خلفية) -->
         <div class="brand-logo">
             <svg viewBox="0 0 1000 550" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-                <rect x="85" y="30" width="38" height="490" fill="#454B7E" />
-                <rect x="240" y="30" width="38" height="490" fill="#454B7E" />
-                <rect x="331" y="30" width="38" height="490" fill="#A19C96" />
-                <polygon points="369,30 500,240 631,30 660,30 660,520 631,520 631,155 500,345 369,155 369,520 340,520 340,30" fill="#A19C96" />
-                <rect x="631" y="30" width="38" height="490" fill="#A19C96" />
-                <rect x="722" y="30" width="38" height="490" fill="#454B7E" />
-                <rect x="877" y="30" width="38" height="490" fill="#454B7E" />
-                <path d="M 20 370 C 140 290, 320 245, 500 240 C 680 235, 860 290, 980 370 L 955 395 C 840 320, 680 270, 500 265 C 320 260, 160 320, 45 395 Z" fill="#454B7E" />
+                <rect x="85" y="30" width="38" height="490" fill="#9aa0d6" />
+                <rect x="240" y="30" width="38" height="490" fill="#9aa0d6" />
+                <rect x="331" y="30" width="38" height="490" fill="#d8d3cc" />
+                <polygon points="369,30 500,240 631,30 660,30 660,520 631,520 631,155 500,345 369,155 369,520 340,520 340,30" fill="#d8d3cc" />
+                <rect x="631" y="30" width="38" height="490" fill="#d8d3cc" />
+                <rect x="722" y="30" width="38" height="490" fill="#9aa0d6" />
+                <rect x="877" y="30" width="38" height="490" fill="#9aa0d6" />
+                <path d="M 20 370 C 140 290, 320 245, 500 240 C 680 235, 860 290, 980 370 L 955 395 C 840 320, 680 270, 500 265 C 320 260, 160 320, 45 395 Z" fill="#9aa0d6" />
             </svg>
         </div>
         <div class="brand-text">
@@ -479,24 +509,16 @@
 
 <main class="app-content">
 
-    <!-- ===== شريط الفترة الزمنية ===== -->
-    <div class="period-bar">
-        <div class="pb-item">
-            <i class="fas fa-calendar-day"></i>
-            <span class="pb-label">أقدم تعليق:</span>
-            <span class="pb-value" id="oldestDate">—</span>
+    <!-- ===== كارت الفترة الزمنية ===== -->
+    <div class="period-card">
+        <div class="pc-left">
+            <div class="pc-icon"><i class="fas fa-calendar-range"></i></div>
+            <div class="pc-text">
+                <div class="pc-label">الفترة الزمنية التي تغطيها البيانات</div>
+                <div class="pc-value" id="periodSpan">—</div>
+            </div>
         </div>
-        <div class="pb-item">
-            <i class="fas fa-calendar-check"></i>
-            <span class="pb-label">أحدث تعليق:</span>
-            <span class="pb-value" id="newestDate">—</span>
-        </div>
-        <div class="pb-item">
-            <i class="fas fa-hourglass-half"></i>
-            <span class="pb-label">المدة:</span>
-            <span class="pb-value" id="periodSpan">—</span>
-        </div>
-        <div class="pb-range">
+        <div class="pc-range">
             <i class="fas fa-filter"></i> نطاق التحليل: آخر 6 أشهر
         </div>
     </div>
@@ -601,7 +623,7 @@
 const hotelData = {
     hotelName: "فندق حياة المدينة",
     googleRating: 4.3,
-    lastUpdate: "2026-11-15 14:30",
+    lastUpdate: "2026-11-15",          // تاريخ فقط بدون ساعة
     oldestComment: "2026-05-12",
     newestComment: "2026-11-14",
     analysisRange: "آخر 6 أشهر",
@@ -733,9 +755,12 @@ function renderIndicators() {
 
 function renderPeriod() {
     const d = hotelData;
-    document.getElementById('oldestDate').textContent = d.oldestComment;
-    document.getElementById('newestDate').textContent = d.newestComment;
-    document.getElementById('periodSpan').textContent = computePeriodSpan(d.oldestComment, d.newestComment);
+    // عرض الفترة كاملة: من تاريخ إلى تاريخ + المدة
+    const from = d.oldestComment;
+    const to = d.newestComment;
+    const span = computePeriodSpan(from, to);
+    document.getElementById('periodSpan').textContent = `${from}  —  ${to}   (${span})`;
+    // تاريخ التحديث فقط بدون ساعة
     document.getElementById('lastUpdate').textContent = d.lastUpdate;
 }
 
