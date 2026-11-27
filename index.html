@@ -70,25 +70,6 @@
         white-space: nowrap;
     }
 
-    .header-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-
-    /* آخر تحديث: إيموجي + تاريخ فقط */
-    .update-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(74, 222, 128, 0.1);
-        border: 1px solid rgba(74, 222, 128, 0.35);
-        color: #4ade80;
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        white-space: nowrap;
-        direction: ltr; /* ليظهر الإيموجي ثم التاريخ بمحاذاة طبيعية */
-    }
-    .update-badge .ub-emoji { font-size: 13px; }
-
     /* ===== المحتوى ===== */
     .app-content {
         max-width: 1100px;
@@ -96,12 +77,12 @@
         padding: 18px 16px 40px;
     }
 
-    /* ===== كارت نطاق التعليقات ===== */
+    /* ===== كارت نطاق التعليقات + آخر تحديث ===== */
     .period-card {
         background: linear-gradient(145deg, #1a1f2e, #0f121f);
         border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 10px;
-        padding: 18px 20px;
+        padding: 16px 20px;
         margin-bottom: 16px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         display: flex;
@@ -119,45 +100,52 @@
         width: 4px; height: 100%;
         background: linear-gradient(180deg, #9aa0d6, #454B7E);
     }
-    .period-card .pc-left {
+
+    /* العنصران داخل الكارت */
+    .period-card .pc-item {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
         min-width: 0;
     }
     .period-card .pc-icon {
-        width: 44px; height: 44px;
+        width: 42px; height: 42px;
         border-radius: 10px;
-        background: rgba(69, 75, 126, 0.35);
-        color: #9aa0d6;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 17px;
         flex-shrink: 0;
     }
+    .period-card .pc-icon.ic-range {
+        background: rgba(69, 75, 126, 0.35);
+        color: #9aa0d6;
+    }
+    .period-card .pc-icon.ic-update {
+        background: rgba(74, 222, 128, 0.12);
+        color: #4ade80;
+    }
+    .period-card .pc-text { min-width: 0; }
     .period-card .pc-label {
-        font-size: 13px;
+        font-size: 11px;
         font-weight: 700;
         color: #94a3b8;
+        margin-bottom: 2px;
     }
-    .period-card .pc-label strong {
+    .period-card .pc-value {
+        font-size: 15px;
+        font-weight: 800;
         color: #e2e8f0;
-        font-weight: 800;
-        font-size: 16px;
-    }
-    .period-card .pc-range {
-        background: rgba(251, 191, 36, 0.1);
-        border: 1px solid rgba(251, 191, 36, 0.35);
-        color: #fbbf24;
-        padding: 8px 16px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 800;
         white-space: nowrap;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
+    }
+    .period-card .pc-value.green { color: #4ade80; direction: ltr; }
+
+    /* فاصل عمودي بين الفقرتين */
+    .period-card .pc-divider {
+        width: 1px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.08);
+        flex-shrink: 0;
     }
 
     /* ===== البطاقات الإحصائية ===== */
@@ -215,7 +203,6 @@
     .sc-neg   .sc-icon { background: rgba(239, 68, 68, 0.15);  color: #f87171; }
     .sc-neu   .sc-icon { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
 
-    /* الأرقام بالإنجليزية دائمًا */
     .stat-card .sc-value {
         font-size: 28px;
         font-weight: 800;
@@ -458,10 +445,12 @@
     @media (max-width: 520px) {
         .app-content { padding: 14px 12px 30px; }
         .stat-card .sc-value { font-size: 24px; }
-        .header-meta { width: 100%; justify-content: flex-start; }
         .brand .brand-title { font-size: 14px; }
         .brand-logo { width: 50px; height: 38px; }
         .donut { width: 130px; height: 130px; }
+        .period-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .period-card .pc-divider { display: none; }
+        .period-card .pc-value { font-size: 14px; white-space: normal; }
     }
 </style>
 </head>
@@ -470,7 +459,6 @@
 <!-- ===== الهيدر ===== -->
 <header class="app-header">
     <div class="brand">
-        <!-- شعار فندق حياة المدينة — مفرّغ -->
         <div class="brand-logo">
             <svg viewBox="0 0 1000 550" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
                 <rect x="85" y="30" width="38" height="490" fill="#9aa0d6" />
@@ -488,23 +476,29 @@
             <div class="brand-sub">تقييمات Google Map</div>
         </div>
     </div>
-    <div class="header-meta">
-        <!-- آخر تحديث: إيموجي + تاريخ فقط -->
-        <div class="update-badge">
-            <span class="ub-emoji">🕓</span>
-            <span id="lastUpdate">—</span>
-        </div>
-    </div>
 </header>
 
 <main class="app-content">
 
-    <!-- ===== كارت نطاق التعليقات ===== -->
+    <!-- ===== كارت نطاق التعليقات + آخر تحديث ===== -->
     <div class="period-card">
-        <div class="pc-left">
-            <div class="pc-icon"><i class="fas fa-calendar-range"></i></div>
-            <div class="pc-label">
-                نطاق التعليقات: <strong id="periodSpan">6 أشهر</strong>
+        <!-- نطاق التعليقات -->
+        <div class="pc-item">
+            <div class="pc-icon ic-range"><i class="fas fa-calendar-range"></i></div>
+            <div class="pc-text">
+                <div class="pc-label">نطاق التعليقات</div>
+                <div class="pc-value" id="periodSpan">6 أشهر</div>
+            </div>
+        </div>
+
+        <div class="pc-divider"></div>
+
+        <!-- آخر تحديث -->
+        <div class="pc-item">
+            <div class="pc-icon ic-update"><i class="fas fa-clock-rotate-left"></i></div>
+            <div class="pc-text">
+                <div class="pc-label">آخر تحديث</div>
+                <div class="pc-value green" id="lastUpdate">—</div>
             </div>
         </div>
     </div>
@@ -603,14 +597,14 @@
 
 <script>
 /* ================================================================
-   البيانات التجريبية — قابلة للاستبدال ببيانات Google Maps الفعلية
+   البيانات التجريبية
    ================================================================ */
 
 const hotelData = {
     hotelName: "فندق حياة المدينة",
     googleRating: 4.3,
-    lastUpdate: "2026-11-15",          // تاريخ فقط بدون ساعة
-    analysisRange: "6 أشهر",            // نطاق التعليقات فقط
+    lastUpdate: "2026-11-15",
+    analysisRange: "6 أشهر",
 
     total: 428,
     positive: 312,
@@ -650,7 +644,6 @@ const hotelData = {
    الحسابات والعرض
    ================================================================ */
 
-/* جميع الأرقام بالإنجليزية دائمًا */
 function fmt(n) { return n.toLocaleString('en-US'); }
 function pct(n, total) { return total > 0 ? ((n / total) * 100).toFixed(1) : '0'; }
 
@@ -759,9 +752,6 @@ function renderAspects() {
     `).join('');
 }
 
-/* ================================================================
-   التهيئة
-   ================================================================ */
 window.addEventListener('DOMContentLoaded', () => {
     renderPeriod();
     renderStats();
